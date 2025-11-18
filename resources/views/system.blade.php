@@ -19,7 +19,7 @@
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <img src="{{ asset('images/Logo.png') }}" alt="Logo">
+        <img src="{{ asset('images/kerk.jpg') }}" alt="Logo">
     </div>
     <center>
         <ul>
@@ -41,13 +41,13 @@
 
 <div class="header">
     <button class="toggle-btn" type="button" data-toggle="sidebar">☰</button>
-    <h1>[INSERT TITLE] Inventory System</h1>
+    <h1>Elenagin Inventory System</h1>
 
     <div class="user-profile" id="userProfile">
         <span>Welcome, {{ $user->name }}!</span>
         <div class="profile-picture" id="profileTrigger">
             <img src="{{ $user->role === 'employee'
-                ? asset('images/EmployeeProfile.png')
+                ? asset('images/kerk.jpg')
                 : asset('images/' . $profilePicture) }}" alt="Profile Picture">
         </div>
 

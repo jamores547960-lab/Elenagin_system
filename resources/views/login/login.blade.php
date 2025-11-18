@@ -10,7 +10,7 @@
   <div class="login-wrapper">
     <div class="login-box">
       <div class="login-header">
-        <h1>[SYSTEM NAME]</h1>
+        <h1>Elenagin</h1>
         <p>[ Insert Text ]</p>
       </div>
 

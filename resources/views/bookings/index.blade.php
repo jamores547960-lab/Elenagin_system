@@ -7,56 +7,63 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">BOOKINGS</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-calendar-check"></i> BOOKINGS
+    </h2>
+</div>
 
 <div class="glass-card glass-card-wide">
 
     @if(session('success'))
-        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+        <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-left: 4px solid #48bb78; border-radius: 10px; padding: 14px 18px; color: #2f855a; font-weight: 500; border: 1px solid rgba(72, 187, 120, 0.2);">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
     @endif
     @if($errors->any())
-        <div class="alert alert-danger mb-3">
-            <ul class="m-0 ps-3" style="font-size:.7rem;">
+        <div class="alert alert-danger mb-3" style="background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05)); border-left: 4px solid #f56565; border-radius: 10px; padding: 14px 18px; color: #c53030; font-weight: 500; border: 1px solid rgba(245, 101, 101, 0.2);">
+            <i class="fas fa-exclamation-triangle"></i> Errors:
+            <ul class="m-0 ps-3 mt-2" style="font-size:.85rem;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
         </div>
     @endif
 
-    <div class="toolbar-top d-flex flex-wrap align-items-end gap-3 mb-3">
-        <div class="search-bar-wrapper" style="flex:1 1 360px;">
-            <form method="GET" action="{{ route('bookings.index') }}" class="search-bar" autocomplete="off">
-                <span class="search-icon"><i class="bi bi-search"></i></span>
+    <div class="toolbar-modern mb-4">
+        <div class="search-bar-wrapper" style="flex:1;max-width:600px;">
+            <form method="GET" action="{{ route('bookings.index') }}" class="search-bar-modern" autocomplete="off">
+                <span class="search-icon" style="color:#667eea;"><i class="fas fa-search"></i></span>
                 <input type="text"
                        name="search"
                        value="{{ $search }}"
-                       class="search-input"
+                       style="flex:1;border:none;outline:none;font-size:0.95rem;background:transparent;"
                        placeholder="Search booking ID, customer, email, service...">
                 @if($search)
                     <button type="button"
-                            class="search-clear"
+                            style="background:none;border:none;color:#667eea;cursor:pointer;padding:4px 8px;"
                             onclick="window.location='{{ route('bookings.index', array_filter(['status'=>$status])) }}'">
-                        <i class="bi bi-x-lg"></i>
+                        <i class="fas fa-times"></i>
                     </button>
                 @endif
-                <button class="btn btn-primary btn-search-main">Search</button>
+                <button style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-search"></i> Search</button>
             </form>
-            <div class="search-meta">
+            <div class="search-meta" style="margin-top:12px;display:flex;align-items:center;gap:12px;font-size:0.85rem;color:#718096;">
                 @php $total = $bookings->total(); @endphp
-                <span class="result-count">
-                    {{ $total }} {{ \Illuminate\Support\Str::plural('result', $total) }}
-                    @if($search) for "<strong>{{ e($search) }}</strong>" @endif
+                <span style="font-weight:500;">
+                    <i class="fas fa-list"></i> {{ $total }} {{ \Illuminate\Support\Str::plural('result', $total) }}
+                    @if($search) for <strong style="color:#667eea;">"{{ e($search) }}"</strong> @endif
                 </span>
                 @if($search || $status)
-                    <span class="active-filter-chip"><i class="bi bi-funnel"></i> Filter active</span>
+                    <span class="badge-modern badge-info" style="font-size:0.7rem;"><i class="fas fa-filter"></i> Filter active</span>
                 @endif
             </div>
         </div>
 
-        <form method="GET" action="{{ route('bookings.index') }}" class="d-flex flex-wrap gap-2">
+        <form method="GET" action="{{ route('bookings.index') }}" class="filter-group" style="display:flex;gap:10px;align-items:center;">
             @if($search)
                 <input type="hidden" name="search" value="{{ $search }}">
             @endif
-            <select name="status" class="form-select form-input" style="min-width:160px;">
+            <select name="status" class="form-select-modern" style="min-width:180px;">
                 <option value="">All Statuses</option>
                 <option value="pending"    @selected($status==='pending')>Pending</option>
                 <option value="approved"   @selected($status==='approved')>Approved</option>
@@ -64,10 +71,12 @@
                 <option value="completed"  @selected($status==='completed')>Completed</option>
                 <option value="appointed"  @selected($status==='appointed')>Appointed</option>
             </select>
-            <button class="btn btn-secondary" style="white-space:nowrap;">Apply</button>
+            <button style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">Apply Filter</button>
             @if($status)
                 <a href="{{ route('bookings.index', array_filter(['search'=>$search])) }}"
-                   class="btn btn-light">Clear</a>
+                   style="background:#fff;color:#667eea;border:2px solid rgba(102,126,234,0.2);padding:10px 20px;border-radius:8px;font-weight:600;text-decoration:none;transition:all 0.2s ease;"
+                   onmouseover="this.style.borderColor='#667eea';this.style.background='rgba(102,126,234,0.05)'"
+                   onmouseout="this.style.borderColor='rgba(102,126,234,0.2)';this.style.background='#fff'"><i class="fas fa-times-circle"></i> Clear</a>
             @endif
         </form>
     </div>
@@ -147,18 +156,18 @@
                                         class="btn btn-receipt btn-sm"
                                         data-receipt='@json($receiptPayload)'
                                         title="View Receipt">
-                                    <i class="bi bi-receipt-cutoff"></i> Receipt
+                                    <i class="fas fa-receipt"></i> Receipt
                                 </button>
                             @elseif($b->status === 'completed')
                                 <form method="POST" action="{{ route('bookings.appoint',$b->booking_id) }}">
                                     @csrf
                                     <button class="btn btn-appoint btn-sm" title="Appoint">
-                                        <i class="bi bi-calendar-check"></i> Appoint
+                                        <i class="fas fa-calendar-check"></i> Appoint
                                     </button>
                                 </form>
                             @else
                                 <button class="btn btn-appoint btn-sm" style="opacity:.55;cursor:not-allowed;" disabled title="Available after completion">
-                                    <i class="bi bi-calendar-check"></i> Appoint
+                                    <i class="fas fa-calendar-check"></i> Appoint
                                 </button>
                             @endif
                         </div>

@@ -14,6 +14,8 @@ class AuthController extends Controller
                 return redirect()->route('system'); 
             } elseif (Auth::user()->role === 'employee') {
                 return redirect()->route('inventory.index'); 
+            } elseif (Auth::user()->role === 'cashier') {
+                return redirect()->route('cashier.dashboard'); 
             }
         }
         return view('login.login');
@@ -25,13 +27,17 @@ class AuthController extends Controller
             'name' => 'required|string',
             'password' => 'required|string',
         ]);
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             session(['first_login' => true]);
+
             if (Auth::user()->role === 'admin') {
                 return redirect()->route('system');
             } elseif (Auth::user()->role === 'employee') {
                 return redirect()->route('inventory.index');
+            } elseif (Auth::user()->role === 'cashier') {
+                return redirect()->route('cashier.dashboard');
             }
         }
 

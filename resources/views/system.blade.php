@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,49 +7,102 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="{{ asset('css/system.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/pages.css') }}" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    {{-- Font Awesome Icons --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     @yield('head')
     <script src="{{ asset('js/system.js') }}" defer></script>
 </head>
-<body class="{{ session('first_login') ? 'fade-in' : '' }}">
-@php
-    session()->forget('first_login');
-    $user = Auth::user();
-    $profilePicture = $user->name === 'Admin' ? 'AdminProfile.png' : 'default-profile.jpg';
-@endphp
 
-<div class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-        <img src="{{ asset('images/inventory.png') }}" alt="Logo">
+<body class="{{ session('first_login') ? 'fade-in' : '' }}">
+
+    @php
+        session()->forget('first_login');
+        $user = Auth::user();  // ← FIXED (Auth now properly imported)
+        $profilePicture = $user->name === 'Admin' ? 'AdminProfile.png' : 'default-profile.jpg';
+    @endphp
+
+<div class="sidebar modern-sidebar" id="sidebar">
+    <div class="sidebar-logo-modern">
+        <div class="logo-container">
+            <img src="{{ asset('images/inventory.png') }}" alt="Elenagin Logo" class="logo-img" style="display: block !important; visibility: visible !important; opacity: 1 !important;">
+            <div class="logo-text">
+                <span class="logo-title">Elenagin</span>
+                <span class="logo-subtitle">Management System</span>
+            </div>
+        </div>
     </div>
-    <center>
-        <ul>
-            @if($user->role === 'admin')
-                <li><a href="{{ route('system') }}" class="nav-link"><i class="bi bi-activity"></i> Dashboard</a></li>
+    <nav class="sidebar-nav">
+        <ul class="nav-list">
+            {{-- ADJUSTMENT 1: Make Dashboard visible to Admin and Cashier --}}
+            @if(in_array($user->role, ['admin', 'cashier']))
+                <li class="nav-item">
+                    <a href="{{ route('system') }}" class="nav-link {{ request()->routeIs('system') ? 'active' : '' }}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
             @endif
-            <li><a href="{{ route('stock_in.index') }}" class="nav-link"><i class="bi bi-dropbox"></i> Stock-In</a></li>
-            <li><a href="{{ route('inventory.index') }}" class="nav-link"><i class="bi bi-inboxes-fill"></i> Inventory</a></li>
-          <!--  <li><a href="{{ route('services.index') }}" class="nav-link"><i class="bi bi-wrench"></i> Service</a></li>
-            <li><a href="{{ route('bookings.index') }}" class="nav-link"><i class="bi bi-person-lines-fill"></i> Bookings</a></li>-->
-            <li><a href="{{ route('suppliers.index') }}" class="nav-link"><i class="bi bi-person-fill-down"></i> Suppliers</a></li>
+            <li class="nav-item">
+                <a href="{{ route('stock_in.index') }}" class="nav-link {{ request()->routeIs('stock_in.*') ? 'active' : '' }}">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Stock-In</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('inventory.index') }}" class="nav-link {{ request()->routeIs('inventory.index') ? 'active' : '' }}">
+                    <i class="fas fa-boxes"></i>
+                    <span>Inventory</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('suppliers.index') }}" class="nav-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                    <i class="fas fa-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
             @if($user->role === 'admin')
-                <li><a href="{{ route('reports.index') }}" class="nav-link"><i class="bi bi-list-columns"></i> Reports</a></li>
-                <li><a href="{{ route('employees.index') }}" class="nav-link"><i class="bi bi-people-fill"></i> Employees</a></li>
+                <li class="nav-item">
+                    <a href="{{ route('spoilage.index') }}" class="nav-link {{ request()->routeIs('spoilage.*') ? 'active' : '' }}">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Spoilage</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('reports.index') }}" class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('employees.index') }}" class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                        <i class="fas fa-users"></i>
+                        <span>Employees</span>
+                    </a>
+                </li>
             @endif
         </ul>
-    </center>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-badge">
+            <i class="fas fa-user-circle"></i>
+            <div class="user-info">
+                <span class="user-name">{{ $user->name }}</span>
+                <span class="user-role">{{ ucfirst($user->role) }}</span>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="header">
-    <button class="toggle-btn" type="button" data-toggle="sidebar">☰</button>
-    <h1>Elenagin Inventory System</h1>
+    <button class="toggle-btn" type="button" data-toggle="sidebar"><i class="fas fa-bars"></i></button>
+    <h1>Elenagin System</h1>
 
     <div class="user-profile" id="userProfile">
         <span>Welcome, {{ $user->name }}!</span>
         <div class="profile-picture" id="profileTrigger">
-            <img src="{{ $user->role === 'employee'
+            <img src="{{ $user->role === 'cashier'
                 ? asset('images/kerk.jpg')
-                : asset('images/' . $profilePicture) }}" alt="Profile Picture">
+                : asset('images/kerk.jpg' . $profilePicture) }}" alt="Profile Picture">
         </div>
 
         <div class="dropdown-menu hidden" id="dropdownMenu" data-dropdown-menu>
@@ -57,10 +111,11 @@
                 <a href="{{ route('employees.index') }}" class="dropdown-item">View Employees</a>
                 <button class="dropdown-item" data-action="register-employee">Register Employee</button>
             @endif
-            <form action="{{ route('logout') }}" method="GET">
+            <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="logout-btn dropdown-item" data-action="logout">Log-Out</button>
+                <button type="submit" class="logout-btn dropdown-item">Log-Out</button>
             </form>
+
         </div>
 
         <div class="modal hidden" id="viewProfileModal" data-modal>
@@ -105,6 +160,7 @@
                             <input name="email" type="email" class="form-input" required value="{{ old('email') }}">
                         </div>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Password</label>
@@ -113,6 +169,17 @@
                         <div class="form-group">
                             <label>Confirm</label>
                             <input name="password_confirmation" type="password" class="form-input" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-bottom:10px;">
+                        <div class="form-group" style="flex:1 0 100%;">
+                            <label>Role</label>
+                            <select name="role" class="form-input" required>
+                            <option value="cashier" {{ old('role') === 'cashier' ? 'selected' : '' }}>Cashier</option>
+                            <option value="employee" {{ old('role') === 'employee' ? 'selected' : '' }}>Employee (Inventory User)</option>
+                        </select>
+
                         </div>
                     </div>
 
@@ -127,12 +194,14 @@
                             <input name="last_name" class="form-input" required value="{{ old('last_name') }}">
                         </div>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group" style="flex:1 0 100%;">
                             <label>Address</label>
                             <input name="address" class="form-input" required value="{{ old('address') }}">
                         </div>
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Contact #</label>

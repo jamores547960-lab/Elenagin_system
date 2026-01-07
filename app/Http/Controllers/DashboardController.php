@@ -2,149 +2,281 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
-use App\Models\Service;
+use App\Models\Sale;
 use App\Models\Item;
-use App\Models\Supplier;
+use App\Models\StockIn;
+use App\Models\StockOut;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $today      = Carbon::today();
         $monthStart = $today->copy()->startOfMonth();
         $monthEnd   = $today->copy()->endOfMonth();
 
-        $bookingsMonth          = Booking::whereBetween('created_at', [$monthStart, $monthEnd])->count();
-        $servicesCompletedMonth = Service::where('status', Service::STATUS_COMPLETED ?? 'completed')
-            ->whereBetween('updated_at', [$monthStart, $monthEnd])
-            ->count();
-        $pendingServices        = Service::whereIn('status', [
-                Service::STATUS_PENDING ?? 'pending',
-                Service::STATUS_IN_PROGRESS ?? 'in_progress'
-            ])->count();
-        $suppliersAddedMonth    = Supplier::whereBetween('created_at', [$monthStart, $monthEnd])->count();
-        $itemsAddedMonth        = Item::whereBetween('created_at', [$monthStart, $monthEnd])->count();
-        $inventoryValue         = Item::select(DB::raw('SUM(quantity * COALESCE(unit_price,0)) as total'))->value('total') ?? 0;
-        $lowStockCount          = Item::where('quantity','<',5)->count();
+        // Filter Parameters
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : null;
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : null;
+        $categoryId = $request->input('category');
 
-        $topItems = DB::table('service_items')
-            ->select('item_id', DB::raw('SUM(quantity) as uses'))
-            ->groupBy('item_id')
-            ->orderByDesc('uses')
-            ->limit(5)
-            ->get();
-
-        $avgCosts = DB::table('stock_in')
-            ->select('item_id', DB::raw('SUM(total_price) / NULLIF(SUM(quantity),0) as avg_cost'))
-            ->groupBy('item_id');
-
-        $revenueMonth = Service::where('status', Service::STATUS_COMPLETED ?? 'completed')
-            ->whereBetween('updated_at', [$monthStart, $monthEnd])
-            ->sum('total');
-
-        $cogsMonth = DB::table('service_items')
-            ->join('services','services.id','=','service_items.service_id')
-            ->leftJoinSub($avgCosts,'ac', function($join){
-                $join->on('ac.item_id','=','service_items.item_id');
-            })
-            ->where('services.status', Service::STATUS_COMPLETED ?? 'completed')
-            ->whereBetween('services.updated_at', [$monthStart, $monthEnd])
-            ->select(DB::raw('SUM(service_items.quantity * COALESCE(ac.avg_cost, service_items.unit_price,0)) as cogs'))
-            ->value('cogs') ?? 0;
-
-        $profitMonth       = $revenueMonth - $cogsMonth;
-        $profitMarginMonth = $revenueMonth > 0 ? ($profitMonth / $revenueMonth) : 0;
-
-        $topSalesItems = DB::table('service_items')
-            ->join('services','services.id','=','service_items.service_id')
-            ->where('services.status', Service::STATUS_COMPLETED ?? 'completed')
-            ->whereBetween('services.updated_at', [$monthStart,$monthEnd])
-            ->select('service_items.item_id',
-                     DB::raw('SUM(service_items.line_total) as revenue'),
-                     DB::raw('SUM(service_items.quantity) as qty'))
-            ->groupBy('service_items.item_id')
-            ->orderByDesc('revenue')
-            ->limit(5)
-            ->get();
-
-        $prevMonthStart = $monthStart->copy()->subMonth();
-        $prevMonthEnd   = $monthStart->copy()->subDay();
-
-        $customersCurrentMonth = Booking::whereBetween('created_at', [$monthStart,$monthEnd])->count();
-        $customersPrevMonth    = Booking::whereBetween('created_at', [$prevMonthStart,$prevMonthEnd])->count();
-        $customerGrowthRate    = $customersPrevMonth > 0
-            ? (($customersCurrentMonth - $customersPrevMonth) / $customersPrevMonth) * 100
-            : null;
-
-        // Adaptive Top Service Types query
-        if (Schema::hasColumn('services','service_type_id') && Schema::hasTable('service_types')) {
-            $topServices = DB::table('services')
-                ->join('service_types','service_types.id','=','services.service_type_id')
-                ->where('services.status', Service::STATUS_COMPLETED ?? 'completed')
-                ->whereBetween('services.updated_at', [$monthStart,$monthEnd])
-                ->select('service_types.name',
-                         DB::raw('COUNT(services.id) as count'),
-                         DB::raw('SUM(services.total) as revenue'))
-                ->groupBy('service_types.name')
-                ->orderByDesc('count')
-                ->limit(5)
-                ->get();
-        } elseif (Schema::hasColumn('services','service_type')) {
-            $topServices = DB::table('services')
-                ->where('services.status', Service::STATUS_COMPLETED ?? 'completed')
-                ->whereBetween('services.updated_at', [$monthStart,$monthEnd])
-                ->select('services.service_type as name',
-                         DB::raw('COUNT(services.id) as count'),
-                         DB::raw('SUM(services.total) as revenue'))
-                ->groupBy('services.service_type')
-                ->orderByDesc('count')
-                ->limit(5)
-                ->get();
-        } else {
-            $topServices = collect();
+        // ============================================
+        // SALES METRICS (with filters)
+        // ============================================
+        
+        // Base sales query
+        $salesQuery = Sale::query();
+        if ($startDate && $endDate) {
+            $salesQuery->whereBetween('sale_date', [$startDate, $endDate]);
         }
-
-        $dailyBookings = Booking::select(DB::raw('DATE(created_at) as d'), DB::raw('COUNT(*) as c'))
-            ->where('created_at','>=', now()->subDays(6)->startOfDay())
-            ->groupBy('d')
-            ->orderBy('d')
+        if ($categoryId) {
+            $salesQuery->whereHas('items.item', function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            });
+        }
+        
+        // Total Sales (filtered or all time)
+        $totalSales = (clone $salesQuery)->sum('total_amount') ?? 0;
+        
+        // Sales This Month
+        $salesThisMonth = Sale::whereMonth('sale_date', now()->month)
+            ->whereYear('sale_date', now()->year)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->whereHas('items.item', function($q2) use ($categoryId) {
+                    $q2->where('item_category_id', $categoryId);
+                });
+            })
+            ->sum('total_amount') ?? 0;
+        
+        // Sales Today
+        $salesToday = Sale::whereDate('sale_date', today())
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->whereHas('items.item', function($q2) use ($categoryId) {
+                    $q2->where('item_category_id', $categoryId);
+                });
+            })
+            ->sum('total_amount') ?? 0;
+        
+        // Sales This Week
+        $salesThisWeek = Sale::whereBetween('sale_date', [
+            now()->startOfWeek(),
+            now()->endOfWeek()
+        ])
+        ->when($categoryId, function($q) use ($categoryId) {
+            $q->whereHas('items.item', function($q2) use ($categoryId) {
+                $q2->where('item_category_id', $categoryId);
+            });
+        })
+        ->sum('total_amount') ?? 0;
+        
+        // Total Transactions
+        $totalTransactions = (clone $salesQuery)->count();
+        $transactionsThisMonth = Sale::whereMonth('sale_date', now()->month)
+            ->whereYear('sale_date', now()->year)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->whereHas('items.item', function($q2) use ($categoryId) {
+                    $q2->where('item_category_id', $categoryId);
+                });
+            })
+            ->count();
+        
+        // ============================================
+        // INVENTORY METRICS (with category filter)
+        // ============================================
+        
+        // Total Items in Inventory
+        $totalItems = Item::where('active', 1)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
+            ->count();
+        
+        // Total Stock Quantity
+        $totalStockQuantity = Item::where('active', 1)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
+            ->sum('quantity') ?? 0;
+        
+        // Total Inventory Value (qty * unit_price)
+        $totalInventoryValue = Item::where('active', 1)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
             ->get()
-            ->map(fn($r)=> ['date'=>$r->d,'count'=>$r->c]);
-
-        $monthlyServices = Service::select(
-                DB::raw("DATE_FORMAT(created_at,'%Y-%m') as m"),
-                DB::raw('COUNT(*) as c')
+            ->sum(function($item) {
+                return $item->quantity * $item->unit_price;
+            });
+        
+        // Low Stock Items (quantity <= 10)
+        $lowStockCount = Item::where('active', 1)
+            ->where('quantity', '<=', 10)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
+            ->count();
+        
+        $lowStockItems = Item::where('active', 1)
+            ->where('quantity', '<=', 10)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
+            ->orderBy('quantity', 'asc')
+            ->limit(10)
+            ->get();
+        
+        // Out of Stock Items
+        $outOfStockCount = Item::where('active', 1)
+            ->where('quantity', 0)
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            })
+            ->count();
+        
+        // ============================================
+        // TOP SELLING ITEMS (by quantity sold, with filters)
+        // ============================================
+        
+        $topSellingQuery = DB::table('sale_items')
+            ->join('items', 'sale_items.item_id', '=', 'items.item_id')
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id');
+        
+        if ($startDate && $endDate) {
+            $topSellingQuery->whereBetween('sales.sale_date', [$startDate, $endDate]);
+        }
+        if ($categoryId) {
+            $topSellingQuery->where('items.item_category_id', $categoryId);
+        }
+        
+        $topSellingItems = $topSellingQuery
+            ->select(
+                'items.item_id',
+                'items.name',
+                DB::raw('SUM(sale_items.quantity) as total_quantity_sold'),
+                DB::raw('SUM(sale_items.line_total) as total_revenue')
             )
-            ->where('created_at','>=', now()->subMonths(5)->startOfMonth())
-            ->groupBy('m')
-            ->orderBy('m')
-            ->get()
-            ->map(fn($r)=> ['month'=>$r->m,'count'=>$r->c]);
+            ->groupBy('items.item_id', 'items.name')
+            ->orderBy('total_quantity_sold', 'desc')
+            ->limit(10)
+            ->get();
+        
+        // ============================================
+        // RECENT SALES (Last 10 transactions, with filters)
+        // ============================================
+        
+        $recentSalesQuery = Sale::with(['user', 'items.item']);
+        if ($startDate && $endDate) {
+            $recentSalesQuery->whereBetween('sale_date', [$startDate, $endDate]);
+        }
+        if ($categoryId) {
+            $recentSalesQuery->whereHas('items.item', function($q) use ($categoryId) {
+                $q->where('item_category_id', $categoryId);
+            });
+        }
+        
+        $recentSales = $recentSalesQuery
+            ->orderBy('sale_date', 'desc')
+            ->limit(10)
+            ->get();
+        
+        // ============================================
+        // SALES TREND (Last 7 days, with category filter)
+        // ============================================
+        
+        $salesTrend = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i);
+            $query = Sale::whereDate('sale_date', $date);
+            if ($categoryId) {
+                $query->whereHas('items.item', function($q) use ($categoryId) {
+                    $q->where('item_category_id', $categoryId);
+                });
+            }
+            $amount = $query->sum('total_amount') ?? 0;
+            $salesTrend[] = [
+                'date' => $date->format('M d'),
+                'amount' => $amount
+            ];
+        }
+        
+        // ============================================
+        // MONTHLY SALES TREND (Last 6 months, with category filter)
+        // ============================================
+        
+        $monthlySalesTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = now()->subMonths($i);
+            $query = Sale::whereMonth('sale_date', $month->month)
+                ->whereYear('sale_date', $month->year);
+            if ($categoryId) {
+                $query->whereHas('items.item', function($q) use ($categoryId) {
+                    $q->where('item_category_id', $categoryId);
+                });
+            }
+            $amount = $query->sum('total_amount') ?? 0;
+            $monthlySalesTrend[] = [
+                'month' => $month->format('M Y'),
+                'amount' => $amount
+            ];
+        }
+        
+        // ============================================
+        // STOCK MOVEMENT
+        // ============================================
+        
+        // Total Stock In (This Month)
+        $stockInThisMonth = StockIn::whereMonth('stockin_date', now()->month)
+            ->whereYear('stockin_date', now()->year)
+            ->sum('quantity') ?? 0;
+        
+        // Total Stock Out (This Month)
+        $stockOutThisMonth = StockOut::whereMonth('stockout_date', now()->month)
+            ->whereYear('stockout_date', now()->year)
+            ->sum('quantity') ?? 0;
+        
+        // ============================================
+        // USERS/STAFF
+        // ============================================
+        
+        $totalCashiers = User::where('role', 'cashier')->count();
+        $totalAdmins = User::where('role', 'admin')->count();
+        $totalEmployees = User::where('role', 'employee')->count();
 
         return view('dashboard.index', compact(
-            'bookingsMonth',
-            'servicesCompletedMonth',
-            'pendingServices',
-            'suppliersAddedMonth',
-            'itemsAddedMonth',
-            'inventoryValue',
+            // Sales
+            'totalSales',
+            'salesThisMonth',
+            'salesToday',
+            'salesThisWeek',
+            'totalTransactions',
+            'transactionsThisMonth',
+            
+            // Inventory
+            'totalItems',
+            'totalStockQuantity',
+            'totalInventoryValue',
             'lowStockCount',
-            'topItems',
-            'dailyBookings',
-            'monthlyServices',
-            'revenueMonth',
-            'cogsMonth',
-            'profitMonth',
-            'profitMarginMonth',
-            'topSalesItems',
-            'topServices',
-            'customersCurrentMonth',
-            'customersPrevMonth',
-            'customerGrowthRate'
+            'lowStockItems',
+            'outOfStockCount',
+            
+            // Analytics
+            'topSellingItems',
+            'recentSales',
+            'salesTrend',
+            'monthlySalesTrend',
+            
+            // Stock Movement
+            'stockInThisMonth',
+            'stockOutThisMonth',
+            
+            // Users
+            'totalCashiers',
+            'totalAdmins',
+            'totalEmployees'
         ));
     }
 }

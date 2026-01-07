@@ -22,7 +22,7 @@
                 <a href="#why" class="mini-link">Why Us</a>
                 <a href="#contact" class="mini-link">Contact</a>
                 <button id="openBookingFormBtn" type="button" class="btn btn-primary top-cta">
-                    <i class="bi bi-calendar-plus"></i> Book Now
+                    <i class="fas fa-calendar-plus"></i> Book Now
                 </button>
             </nav>
         </div>
@@ -53,10 +53,10 @@
                     <button type="button"
                             id="openBookingFormBtnHero"
                             class="btn btn-primary hero-book-btn">
-                        <i class="bi bi-calendar-plus"></i> Book Now
+                        <i class="fas fa-calendar-plus"></i> Book Now
                     </button>
                     <a href="#process" class="btn btn-secondary hero-secondary">
-                        <i class="bi bi-arrow-down-circle"></i> How It Works
+                        <i class="fas fa-arrow-circle-down"></i> How It Works
                     </a>
                 </div>
 
@@ -82,10 +82,10 @@
                         INSERT PARAGRAPH
                     </p>
                     <ul class="side-list">
-                        <li><i class="bi bi-check-circle-fill"></i> INSERT TEXT</li>
-                        <li><i class="bi bi-check-circle-fill"></i> INSERT TEXT</li>
-                        <li><i class="bi bi-check-circle-fill"></i> INSERT TEXT</li>
-                        <li><i class="bi bi-check-circle-fill"></i> INSERT TEXT</li>
+                        <li><i class="fas fa-check-circle"></i> INSERT TEXT</li>
+                        <li><i class="fas fa-check-circle"></i> INSERT TEXT</li>
+                        <li><i class="fas fa-check-circle"></i> INSERT TEXT</li>
+                        <li><i class="fas fa-check-circle"></i> INSERT TEXT</li>
                     </ul>
                     <div class="hero-carousel" aria-label="Showcase Images">
                         <div class="carousel-track">
@@ -205,32 +205,32 @@
         </div>
         <div class="card-grid services-grid">
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-speaker"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-volume-up"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-boombox"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-music"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-diagram-3"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-project-diagram"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-sliders2-vertical"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-sliders-h"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-shield-lock"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-shield-alt"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
             <div class="svc-card">
-                <div class="svc-icon gradient"><i class="bi bi-layers"></i></div>
+                <div class="svc-icon gradient"><i class="fas fa-layer-group"></i></div>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT SENTENCE</p>
             </div>
@@ -271,7 +271,7 @@
             </div>
         </div>
         <div class="motto">
-            <i class="bi bi-quote"></i>
+            <i class="fas fa-quote-left"></i>
             <span>"INSERT QUOTE"</span>
         </div>
     </section>
@@ -284,22 +284,22 @@
         </div>
         <div class="why-grid" style="display: flex; justify-content: center;">
             <div class="why-card">
-                <i class="bi bi-award-fill"></i>
+                <i class="fas fa-award-fill"></i>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT QUALITY</p>
             </div>
             <div class="why-card">
-                <i class="bi bi-cash-coin"></i>
+                <i class="fas fa-coins"></i>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT QUALITY</p>
             </div>
             <div class="why-card">
-                <i class="bi bi-hand-thumbs-up-fill"></i>
+                <i class="fas fa-thumbs-up"></i>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT QUALITY</p>
             </div>
             <div class="why-card">
-                <i class="bi bi-chat-dots-fill"></i>
+                <i class="fas fa-comments"></i>
                 <h3>INSERT TEXT</h3>
                 <p>INSERT QUALITY</p>
             </div>
@@ -312,7 +312,7 @@
             <h2 class="cta-title">INSERT TEXT</h2>
             <p class="cta-sub">Schedule your [INSERT] consultation now.</p>
             <button type="button" id="openBookingFormBtnBottom" class="btn btn-primary cta-btn">
-                <i class="bi bi-calendar-plus"></i> Start Booking
+                <i class="fas fa-calendar-plus"></i> Start Booking
             </button>
         </div>
     </section>
@@ -320,7 +320,7 @@
     <footer class="portal-footer">
         <div class="footer-inner">
             <span>&copy; {{ date('Y') }} SYSTEM NAME. All rights reserved.</span>
-            <span class="foot-meta">INSERT TEXT • INSERT TEXT • INSERT TEXT</span>
+            <span class="foot-meta">INSERT TEXT | INSERT TEXT | INSERT TEXT</span>
         </div>
     </footer>
 </div>

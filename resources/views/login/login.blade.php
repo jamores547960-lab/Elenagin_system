@@ -11,7 +11,6 @@
     <div class="login-box">
       <div class="login-header">
         <h1>Login</h1>
-        <p>[ Insert Text ]</p>
       </div>
 
       <form action="{{ route('login.post') }}" method="POST">

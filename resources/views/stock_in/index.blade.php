@@ -7,18 +7,21 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">STOCK-IN</h2>
-
-<div class="page-actions" style="margin-bottom:10px;">
+<div style="position: relative; margin-bottom: 24px;">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-arrow-down"></i> Stock In
+    </h2>
     <button type="button"
-            class="btn btn-primary btn-add-record"
-            style="width:100%;display:flex;justify-content:center;"
+            class="btn btn-primary"
+            style="position: absolute; top: 0; right: 0; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); transition: all 0.2s ease; white-space: nowrap;"
+            onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'"
+            onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(102,126,234,0.2)'"
             data-action="register-stock-in">
-        <i class="bi bi-plus-lg"></i> Add Stock-In
+        <i class="fas fa-plus"></i> Add Stock In
     </button>
 </div>
 
-<div class="glass-card glass-card-wide">
+<div class="glass-card glass-card-wide" style="height: calc(100vh - 250px); display: flex; flex-direction: column;">
 
     @if(session('success'))
         <div class="alert alert-success mb-3">{{ session('success') }}</div>
@@ -34,7 +37,7 @@
     <div class="toolbar-top d-flex flex-wrap justify-content-end gap-3 mb-3">
         <div class="search-bar-wrapper">
             <form method="GET" action="{{ route('stock_in.index') }}" class="search-bar" autocomplete="off">
-                <span class="search-icon"><i class="bi bi-search"></i></span>
+                <span class="search-icon"><i class="fas fa-search"></i></span>
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
@@ -44,7 +47,7 @@
                     <button type="button"
                             class="search-clear"
                             onclick="window.location='{{ route('stock_in.index') }}'">
-                        <i class="bi bi-x-lg"></i>
+                        <i class="fas fa-times"></i>
                     </button>
                 @endif
                 <button class="btn btn-primary btn-search-main" type="submit">Search</button>
@@ -56,13 +59,13 @@
                     @if(request('search')) for "<strong>{{ e(request('search')) }}</strong>" @endif
                 </span>
                 @if(request('search'))
-                    <span class="active-filter-chip"><i class="bi bi-funnel"></i> Filter active</span>
+                    <span class="active-filter-chip"><i class="fas fa-filter"></i> Filter active</span>
                 @endif
             </div>
         </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive" style="flex: 1; overflow-y: auto;">
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -141,7 +144,7 @@
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <h4 style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin:0;">Stock Lines</h4>
                     <button type="button" class="btn btn-secondary btn-sm" id="addStockLine">
-                        <i class="bi bi-plus-lg"></i> Add Line
+                        <i class="fas fa-plus"></i> Add Line
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -210,7 +213,7 @@
         <td class="stock-line-total text-end">0.00</td>
         <td>
             <button type="button" class="btn btn-delete btn-sm remove-stock-line">
-                <i class="bi bi-x"></i>
+                <i class="fas fa-times"></i>
             </button>
         </td>
     </tr>

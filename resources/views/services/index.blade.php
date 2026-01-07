@@ -7,22 +7,29 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">SERVICES</h2>
-
-<div class="page-actions" style="display:flex;gap:10px;margin-bottom:10px;">
-    <button type="button"
-            class="btn btn-secondary"
-            id="openServiceTypesBtn"
-            style="flex:1;display:flex;justify-content:center;align-items:center;">
-        <i class="bi bi-list-ul"></i> Service Types
-    </button>
-    <button type="button"
-            class="btn btn-primary"
-            data-action="register-service"
-            @if($booking && !$booking->service) data-booking="{{ $booking->booking_id }}" @endif
-            style="flex:1;display:flex;justify-content:center;align-items:center;">
-        <i class="bi bi-plus-lg"></i> New Service
-    </button>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-tools"></i> Services
+    </h2>
+    <div style="display:flex;gap:12px;">
+        <button type="button"
+                class="btn btn-secondary"
+                id="openServiceTypesBtn"
+                style="display:flex;align-items:center;gap:8px;background:#ffffff;border:2px solid rgba(102,126,234,0.2);color:#667eea;padding:12px 20px;border-radius:10px;font-weight:600;transition:all 0.2s ease;box-shadow:0 2px 8px rgba(0,0,0,0.04);"
+                onmouseover="this.style.borderColor='#667eea';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.15)'"
+                onmouseout="this.style.borderColor='rgba(102,126,234,0.2)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+            <i class="fas fa-list"></i> Service Types
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                data-action="register-service"
+                @if($booking && !$booking->service) data-booking="{{ $booking->booking_id }}" @endif
+                style="display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:12px 20px;border-radius:10px;font-weight:600;box-shadow:0 4px 12px rgba(102,126,234,0.15);transition:all 0.2s ease;"
+                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(102,126,234,0.4)'"
+                onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.15)'">
+            <i class="fas fa-plus"></i> New Service
+        </button>
+    </div>
 </div>
 
 @if(session('success'))
@@ -43,8 +50,8 @@
     </div>
 @endif
 
-<div class="glass-card glass-card-wide">
-    <div class="table-responsive">
+<div class="glass-card glass-card-wide" style="height: calc(100vh - 300px); display: flex; flex-direction: column;">
+    <div class="table-responsive" style="flex: 1; overflow-y: auto;">
         <table class="table align-middle">
             <thead>
             <tr>
@@ -92,7 +99,7 @@
                         <div class="d-flex gap-1">
                             <a href="{{ route('services.edit',$service) }}"
                                class="btn btn-edit btn-sm" title="Edit">
-                                <i class="bi bi-pencil-square"></i>
+                                <i class="fas fa-edit"></i>
                             </a>
                         </div>
                     </td>
@@ -161,7 +168,7 @@
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                     <h4 style="font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin:0;">Items Used</h4>
                     <button type="button" class="btn btn-secondary btn-sm" id="addLineItem">
-                        <i class="bi bi-plus-lg"></i> Add
+                        <i class="fas fa-plus"></i> Add
                     </button>
                 </div>
                 <div class="table-responsive">
@@ -212,7 +219,7 @@
         <td><input type="number" data-name="quantity" class="form-input qty-input text-end" min="1" value="1" required></td>
         <td><input type="number" data-name="unit_price" class="form-input price-input text-end" step="0.01" min="0"></td>
         <td class="line-total-cell text-end">0.00</td>
-        <td><button type="button" class="btn btn-delete btn-sm remove-line"><i class="bi bi-x"></i></button></td>
+        <td><button type="button" class="btn btn-delete btn-sm remove-line"><i class="fas fa-times"></i></button></td>
     </tr>
 </template>
 

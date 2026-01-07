@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class StockOut extends Model
 {
     use SoftDeletes;
+
     protected $table = 'stock_out';
-    protected $primaryKey = 'stockout_id';
-    public $incrementing = false;
-    protected $keyType = 'string';
+
+    // Use standard auto-increment id as primary key
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
         'stockout_id',
@@ -21,6 +24,13 @@ class StockOut extends Model
         'stockout_date',
         'reference_type',
         'reference_id',
+        'reason',
+        'notes',
+    ];
+
+    protected $casts = [
+        'quantity' => 'integer',
+        'stockout_date' => 'date',
     ];
 
     public function item()
@@ -31,5 +41,14 @@ class StockOut extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
+     * Polymorphic owner (Sale, Service, etc.)
+     * This allows $stockOut->reference to return the Sale model instance.
+     */
+    public function reference()
+    {
+        return $this->morphTo();
     }
 }

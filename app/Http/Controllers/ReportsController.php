@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Models\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -145,5 +146,168 @@ class ReportsController extends Controller
             'eventTypeCounts',
             'rangeDefined'
         ));
+    }
+
+    /**
+     * Automated Reports Dashboard
+     */
+    public function automated()
+    {
+        // Get statistics for automated reports
+        $dailyReportCount = ActivityLog::where('event_type', 'report.generated.daily')
+            ->whereDate('occurred_at', today())
+            ->count();
+        
+        $weeklyReportCount = ActivityLog::where('event_type', 'report.generated.weekly')
+            ->whereBetween('occurred_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+        
+        $monthlyReportCount = ActivityLog::where('event_type', 'report.generated.monthly')
+            ->whereMonth('occurred_at', now()->month)
+            ->count();
+
+        return view('reports.automated', compact(
+            'dailyReportCount',
+            'weeklyReportCount',
+            'monthlyReportCount'
+        ));
+    }
+
+    /**
+     * Generate Daily Report
+     */
+    public function generateDaily(Request $request)
+    {
+        $date = today();
+        $sales = Sale::with('items')->whereDate('sale_date', $date)->get();
+        $totalSales = $sales->sum('total_amount');
+        $transactionCount = $sales->count();
+
+        // Log the report generation
+        ActivityLog::create([
+            'event_type' => 'report.generated.daily',
+            'subject_type' => 'App\Models\Sale',
+            'subject_id' => null,
+            'user_id' => auth()->id(),
+            'description' => 'Daily report generated for ' . $date->format('Y-m-d'),
+            'meta' => json_encode([
+                'date' => $date->format('Y-m-d'),
+                'total_sales' => $totalSales,
+                'transaction_count' => $transactionCount
+            ]),
+            'occurred_at' => now(),
+        ]);
+
+        // Check if PDF export is requested
+        if ($request->input('format') === 'pdf') {
+            return view('reports.pdf.daily', [
+                'date' => $date->format('F d, Y'),
+                'sales' => $sales,
+                'totalSales' => $totalSales,
+                'transactionCount' => $transactionCount
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'date' => $date->format('F d, Y'),
+                'total_sales' => number_format($totalSales, 2),
+                'transaction_count' => $transactionCount
+            ]
+        ]);
+    }
+
+    /**
+     * Generate Weekly Report  
+     */
+    public function generateWeekly(Request $request)
+    {
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
+        
+        $sales = Sale::with('items')->whereBetween('sale_date', [$startOfWeek, $endOfWeek])->get();
+        $totalSales = $sales->sum('total_amount');
+        $transactionCount = $sales->count();
+
+        ActivityLog::create([
+            'event_type' => 'report.generated.weekly',
+            'subject_type' => 'App\Models\Sale',
+            'subject_id' => null,
+            'user_id' => auth()->id(),
+            'description' => 'Weekly report generated for week of ' . $startOfWeek->format('Y-m-d'),
+            'meta' => json_encode([
+                'start_date' => $startOfWeek->format('Y-m-d'),
+                'end_date' => $endOfWeek->format('Y-m-d'),
+                'total_sales' => $totalSales,
+                'transaction_count' => $transactionCount
+            ]),
+            'occurred_at' => now(),
+        ]);
+
+        // Check if PDF export is requested
+        if ($request->input('format') === 'pdf') {
+            return view('reports.pdf.weekly', [
+                'period' => $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y'),
+                'sales' => $sales,
+                'totalSales' => $totalSales,
+                'transactionCount' => $transactionCount
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'period' => $startOfWeek->format('M d') . ' - ' . $endOfWeek->format('M d, Y'),
+                'total_sales' => number_format($totalSales, 2),
+                'transaction_count' => $transactionCount
+            ]
+        ]);
+    }
+
+    /**
+     * Generate Monthly Report
+     */
+    public function generateMonthly(Request $request)
+    {
+        $startOfMonth = now()->startOfMonth();
+        $endOfMonth = now()->endOfMonth();
+        
+        $sales = Sale::with('items')->whereBetween('sale_date', [$startOfMonth, $endOfMonth])->get();
+        $totalSales = $sales->sum('total_amount');
+        $transactionCount = $sales->count();
+
+        ActivityLog::create([
+            'event_type' => 'report.generated.monthly',
+            'subject_type' => 'App\Models\Sale',
+            'subject_id' => null,
+            'user_id' => auth()->id(),
+            'description' => 'Monthly report generated for ' . $startOfMonth->format('F Y'),
+            'meta' => json_encode([
+                'month' => $startOfMonth->format('Y-m'),
+                'total_sales' => $totalSales,
+                'transaction_count' => $transactionCount
+            ]),
+            'occurred_at' => now(),
+        ]);
+
+        // Check if PDF export is requested
+        if ($request->input('format') === 'pdf') {
+            return view('reports.pdf.monthly', [
+                'month' => $startOfMonth->format('F Y'),
+                'sales' => $sales,
+                'totalSales' => $totalSales,
+                'transactionCount' => $transactionCount
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'month' => $startOfMonth->format('F Y'),
+                'total_sales' => number_format($totalSales, 2),
+                'transaction_count' => $transactionCount
+            ]
+        ]);
     }
 }

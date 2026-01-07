@@ -11,9 +11,27 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">REPORTS</h2>
+<div style="position: relative; margin-bottom: 24px;">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-chart-bar"></i> REPORTS
+    </h2>
+    <div style="position: absolute; top: 0; right: 0; display: flex; gap: 10px;">
+        <a href="{{ route('stock_out.index') }}"
+           style="display: inline-flex; align-items: center; gap: 6px; background: #ffffff; border: 2px solid rgba(102, 126, 234, 0.2); color: #667eea; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); transition: all 0.2s ease; white-space: nowrap;"
+           onmouseover="this.style.borderColor='#667eea';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.15)'"
+           onmouseout="this.style.borderColor='rgba(102,126,234,0.2)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+            <i class="fas fa-arrow-up"></i> Stock-Out Records
+        </a>
+        <a href="{{ route('reports.automated') }}"
+           style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-decoration: none; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); transition: all 0.2s ease; white-space: nowrap;"
+           onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'"
+           onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(102,126,234,0.2)'">
+            <i class="fas fa-robot"></i> Automated Reports
+        </a>
+    </div>
+</div>
 
-<div class="metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px;">
+<!--<div class="metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px;">
     <div class="metric-card"><div class="metric-label">Appointments (Month)</div><div class="metric-value">{{ $appointmentsThisMonth }}</div></div>
     <div class="metric-card"><div class="metric-label">Avg App / Day</div><div class="metric-value">{{ $avgAppointmentsPerDay }}</div></div>
     <div class="metric-card"><div class="metric-label">Services Completed</div><div class="metric-value">{{ $servicesCompletedMonth }}</div></div>
@@ -28,14 +46,7 @@
             @endforelse
         </div>
     </div>
-</div>
-<div style="margin-bottom:18px;">
-    <a href="{{ route('stock_out.index') }}"
-       class="btn btn-secondary"
-       style="width:100%;display:flex;justify-content:center;">
-        <i class="bi bi-box-arrow-up"></i> Stock-Out Records
-    </a>
-</div>
+</div>-->
 <div class="glass-card glass-card-wide">
     <form id="reportsFilterForm" method="GET"
         style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;align-items:end;">

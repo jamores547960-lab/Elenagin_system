@@ -7,102 +7,119 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">SUPPLIERS</h2>
-
-<div class="page-actions mb-3" style="display:flex; justify-content:flex-end; gap:10px; margin-bottom:10px;">
+<div style="position: relative; margin-bottom: 24px;">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-truck"></i> SUPPLIERS
+    </h2>
     <button type="button"
-            class="btn btn-primary btn-add-record"
-            data-action="register-supplier">
-        <i class="bi bi-plus-lg"></i> Add Supplier
+            class="btn btn-primary"
+            data-action="register-supplier"
+            style="position: absolute; top: 0; right: 0; display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); transition: all 0.2s ease; white-space: nowrap;"
+            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.3)'"
+            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(102, 126, 234, 0.2)'">
+        <i class="fas fa-plus"></i> Add Supplier
     </button>
 </div>
 
-<div class="glass-card glass-card-wide">
+<div class="glass-card glass-card-wide" style="height: calc(100vh - 250px); display: flex; flex-direction: column;">
 
     @if(session('success'))
-        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+        <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-left: 4px solid #48bb78; border-radius: 10px; padding: 14px 18px; color: #2f855a; font-weight: 500; border: 1px solid rgba(72, 187, 120, 0.2);">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
     @endif
     @if($errors->any())
-        <div class="alert alert-danger mb-3">
-            <ul class="m-0 ps-3" style="font-size:.7rem;">
+        <div class="alert alert-danger mb-3" style="background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05)); border-left: 4px solid #f56565; border-radius: 10px; padding: 14px 18px; color: #c53030; font-weight: 500; border: 1px solid rgba(245, 101, 101, 0.2);">
+            <i class="fas fa-exclamation-triangle"></i> Please fix the errors:
+            <ul class="m-0 ps-3 mt-2" style="font-size:.85rem;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
         </div>
     @endif
 
-    <div class="toolbar-top d-flex flex-wrap justify-content-end align-items-start gap-3 mb-3">
-        <div class="search-bar-wrapper" style="flex:1 1 520px;">
-            <form action="{{ route('suppliers.index') }}" method="GET" class="search-bar" autocomplete="off">
-                <span class="search-icon"><i class="bi bi-search"></i></span>
+    <div class="toolbar-modern mb-4">
+        <div class="search-bar-wrapper" style="flex:1;max-width:600px;">
+            <form action="{{ route('suppliers.index') }}" method="GET" class="search-bar-modern" autocomplete="off">
+                <span class="search-icon" style="color:#667eea;"><i class="fas fa-search"></i></span>
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       class="search-input"
+                       style="flex:1;border:none;outline:none;font-size:0.95rem;background:transparent;"
                        placeholder="Search supplier name, address, phone, contact...">
                 @if(request('search'))
                     <button type="button"
-                            class="search-clear"
+                            style="background:none;border:none;color:#667eea;cursor:pointer;padding:4px 8px;"
                             onclick="window.location='{{ route('suppliers.index') }}'">
-                        <i class="bi bi-x-lg"></i>
+                        <i class="fas fa-times"></i>
                     </button>
                 @endif
-                <button type="submit" class="btn btn-primary btn-search-main">Search</button>
+                <button type="submit" style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-search"></i> Search</button>
             </form>
-            <div class="search-meta">
+            <div class="search-meta" style="margin-top:12px;display:flex;align-items:center;gap:12px;font-size:0.85rem;color:#718096;">
                 @php $total = $suppliers->count(); @endphp
-                <span class="result-count">
-                    {{ $total }} {{ \Illuminate\Support\Str::plural('result',$total) }}
-                    @if(request('search')) for "<strong>{{ e(request('search')) }}</strong>" @endif
+                <span style="font-weight:500;">
+                    <i class="fas fa-list"></i> {{ $total }} {{ \Illuminate\Support\Str::plural('result',$total) }}
+                    @if(request('search')) for <strong style="color:#667eea;">"{{ e(request('search')) }}"</strong> @endif
                 </span>
                 @if(request('search'))
-                    <span class="active-filter-chip">
-                        <i class="bi bi-funnel"></i> Filter active
-                    </span>
+                    <span class="badge-modern badge-info" style="font-size:0.7rem;"><i class="fas fa-filter"></i> Filter active</span>
                 @endif
             </div>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle">
+    <div class="table-responsive" style="flex: 1; overflow-y: auto; border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+        <table class="table table-modern align-middle" style="margin:0;">
             <thead>
                 <tr>
-                    <th>Supplier ID</th>
-                    <th>Name</th>
-                    <th>Address</th>
-                    <th>Phone</th>
-                    <th>Contact Person</th>
-                    <th style="width:130px;">Actions</th>
+                    <th><i class="fas fa-hashtag"></i> Supplier ID</th>
+                    <th><i class="fas fa-building"></i> Name</th>
+                    <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                    <th><i class="fas fa-phone"></i> Phone</th>
+                    <th><i class="fas fa-user"></i> Contact Person</th>
+                    <th style="width:160px;text-align:center;"><i class="fas fa-cog"></i> Actions</th>
                 </tr>
             </thead>
             <tbody>
             @forelse($suppliers as $supplier)
                 <tr>
-                    <td>{{ $supplier->supplier_id }}</td>
-                    <td>{{ $supplier->name }}</td>
-                    <td>{{ $supplier->address }}</td>
-                    <td>{{ $supplier->number }}</td>
-                    <td>{{ $supplier->contact_person }}</td>
+                    <td style="font-weight:600;color:#667eea;">#{{ $supplier->supplier_id }}</td>
+                    <td style="font-weight:600;color:#2d3748;">{{ $supplier->name }}</td>
+                    <td style="color:#718096;">{{ $supplier->address }}</td>
+                    <td style="color:#4a5568;">{{ $supplier->number }}</td>
+                    <td style="color:#4a5568;">{{ $supplier->contact_person }}</td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 justify-content-center">
                             <a href="{{ route('suppliers.edit', $supplier->supplier_id) }}"
-                               class="btn btn-edit" title="Edit">
-                                <i class="bi bi-pencil-square"></i>
+                               class="btn-action btn-action-edit" title="Edit Supplier">
+                                <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('suppliers.destroy', $supplier->supplier_id) }}"
                                   method="POST"
-                                  onsubmit="return confirm('Delete this supplier?');">
+                                  onsubmit="return confirm('Are you sure you want to delete this supplier?');">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-delete" title="Delete">
-                                    <i class="bi bi-trash"></i>
+                                <button type="submit" class="btn-action btn-action-delete" title="Delete Supplier">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </div>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="6" class="empty-row text-center">No suppliers found.</td></tr>
+                <tr><td colspan="6" class="text-center py-5">
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-truck"></i></div>
+                        <div class="empty-state-title">No Suppliers Found</div>
+                        <div class="empty-state-description">
+                            @if(request('search'))
+                                No suppliers match your search. Try different keywords.
+                            @else
+                                Add your first supplier to start managing inventory sources.
+                            @endif
+                        </div>
+                    </div>
+                </td></tr>
             @endforelse
             </tbody>
         </table>

@@ -13,7 +13,7 @@
     <a href="{{ route('reports.index') }}"
        class="btn btn-secondary"
        style="width:100%;display:flex;justify-content:center;">
-        <i class="bi bi-arrow-90deg-left"></i> Back
+        <i class="fas fa-arrow-left"></i> Back
     </a>
 </div>
 
@@ -65,7 +65,7 @@
                                 class="btn btn-receipt btn-sm"
                                 data-receipt='@json($receiptPayload)'
                                 title="View Receipt">
-                            <i class="bi bi-receipt"></i> Receipt
+                            <i class="fas fa-receipt"></i> Receipt
                         </button>
                     </td>
                 </tr>

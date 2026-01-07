@@ -11,72 +11,82 @@
 @endsection
 
 @section('content')
-<h2 class="text-accent">INVENTORY</h2>
-
-<div class="page-actions" style="display:flex;gap:10px;margin-bottom:10px;">
-    <button type="button"
-       class="btn btn-secondary"
-       id="openCategoriesBtn"
-       style="flex:1;display:flex;justify-content:center;align-items:center;">
-        <i class="bi bi-folder2-open"></i> Categories
-    </button>
-    <button type="button"
-            class="btn btn-primary"
-            data-action="register-item"
-            style="flex:1;display:flex;justify-content:center;align-items:center;">
-        <i class="bi bi-plus-lg"></i> Add Item
-    </button>
+<div style="position: relative; margin-bottom: 24px;">
+    <h2 class="text-accent" style="font-size: 1.75rem; font-weight: 700; margin: 0; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        <i class="fas fa-box"></i> Inventory
+    </h2>
+    <div style="position: absolute; top: 0; right: 0; display: flex; gap: 10px;">
+        <button type="button"
+           class="btn btn-secondary"
+           id="openCategoriesBtn"
+           style="display: inline-flex; align-items: center; gap: 6px; background: #ffffff; border: 2px solid rgba(102, 126, 234, 0.2); color: #667eea; padding: 10px 18px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); white-space: nowrap;"
+           onmouseover="this.style.borderColor='#667eea';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.15)'"
+           onmouseout="this.style.borderColor='rgba(102,126,234,0.2)';this.style.boxShadow='0 2px 8px rgba(0,0,0,0.04)'">
+            <i class="fas fa-folder-open"></i> Categories
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                data-action="register-item"
+                style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2); transition: all 0.2s ease; white-space: nowrap;"
+                onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'"
+                onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 8px rgba(102,126,234,0.2)'">
+            <i class="fas fa-plus"></i> Add Item
+        </button>
+    </div>
 </div>
 
-<div class="glass-card glass-card-wide">
+<div class="glass-card glass-card-wide" style="height: calc(100vh - 250px); display: flex; flex-direction: column;">
 
     @if(session('success'))
-        <div class="alert alert-success mb-3">{{ session('success') }}</div>
+        <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-left: 4px solid #48bb78; border-radius: 10px; padding: 14px 18px; color: #2f855a; font-weight: 500; border: 1px solid rgba(72, 187, 120, 0.2);">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+        </div>
     @endif
     @if($errors->any() && old('_from') === 'createItem')
-        <div class="alert alert-danger mb-3">
-            <ul class="m-0 ps-3" style="font-size:.7rem;">
+        <div class="alert alert-danger mb-3" style="background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(245, 101, 101, 0.05)); border-left: 4px solid #f56565; border-radius: 10px; padding: 14px 18px; color: #c53030; font-weight: 500; border: 1px solid rgba(245, 101, 101, 0.2);">
+            <i class="fas fa-exclamation-triangle"></i> Please fix the following errors:
+            <ul class="m-0 ps-3 mt-2" style="font-size:.85rem;">
                 @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
             </ul>
         </div>
     @endif
 
-    <div class="toolbar-top d-flex flex-wrap align-items-end gap-3 mb-3">
-        <div class="search-bar-wrapper" style="flex:1 1 380px;">
-            <form method="GET" action="{{ route('inventory.index') }}" class="search-bar" autocomplete="off">
-                <span class="search-icon"><i class="bi bi-search"></i></span>
+    <div class="toolbar-modern mb-4">
+        <div class="search-bar-wrapper" style="flex:1 1 400px;max-width:600px;">
+            <form method="GET" action="{{ route('inventory.index') }}" class="search-bar-modern" autocomplete="off">
+                <span class="search-icon" style="color:#667eea;"><i class="fas fa-search"></i></span>
                 <input type="text"
                        name="search"
                        value="{{ request('search') }}"
-                       class="search-input"
+                       style="flex:1;border:none;outline:none;font-size:0.95rem;background:transparent;"
                        placeholder="Search item name or category...">
                 @if(request('search'))
                     <button type="button"
-                            class="search-clear"
+                            style="background:none;border:none;color:#667eea;cursor:pointer;padding:4px 8px;"
                             onclick="window.location='{{ route('inventory.index') }}'">
-                        <i class="bi bi-x-lg"></i>
+                        <i class="fas fa-times"></i>
                     </button>
                 @endif
-                <button class="btn btn-primary btn-search-main">Search</button>
+                <button style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"><i class="fas fa-search"></i> Search</button>
             </form>
-            <div class="search-meta">
+            <div class="search-meta" style="margin-top:12px;display:flex;align-items:center;gap:12px;font-size:0.85rem;color:#718096;">
                 @php $total = $items->total(); @endphp
-                <span class="result-count">
-                    {{ $total }} {{ \Illuminate\Support\Str::plural('result',$total) }}
-                    @if(request('search')) for "<strong>{{ e(request('search')) }}</strong>" @endif
+                <span style="font-weight:500;">
+                    <i class="fas fa-list"></i> {{ $total }} {{ \Illuminate\Support\Str::plural('result',$total) }}
+                    @if(request('search')) for <strong style="color:#667eea;">"{{ e(request('search')) }}"</strong> @endif
                 </span>
                 @if(request('search') || request('category_filter'))
-                    <span class="active-filter-chip"><i class="bi bi-funnel"></i> Filter active</span>
+                    <span class="badge-modern badge-info" style="font-size:0.7rem;"><i class="fas fa-filter"></i> Filter active</span>
                 @endif
             </div>
         </div>
 
-        <form method="GET" action="{{ route('inventory.index') }}" class="d-flex flex-wrap gap-2" style="margin-bottom:8px;">
+        <form method="GET" action="{{ route('inventory.index') }}" class="filter-group" style="display:flex;gap:10px;align-items:center;">
             @if(request('search'))
                 <input type="hidden" name="search" value="{{ request('search') }}">
             @endif
-            <select name="category_filter" class="form-select form-input" style="min-width:180px;">
-                <option value="">All Categories</option>
+            <select name="category_filter" class="form-select-modern" style="min-width:200px;">
+                <option value=""><i class="fas fa-filter"></i> All Categories</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->itemctgry_id }}"
                         @selected(request('category_filter') == $cat->itemctgry_id)>
@@ -84,56 +94,76 @@
                     </option>
                 @endforeach
             </select>
-            <button class="btn btn-secondary" style="white-space:nowrap;">Apply</button>
+            <button style="background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(102,126,234,0.3)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">Apply Filter</button>
             @if(request('category_filter'))
                 <a href="{{ route('inventory.index', array_filter(['search'=>request('search')])) }}"
-                   class="btn btn-light">Clear</a>
+                   style="background:#fff;color:#667eea;border:2px solid rgba(102,126,234,0.2);padding:10px 20px;border-radius:8px;font-weight:600;text-decoration:none;transition:all 0.2s ease;"
+                   onmouseover="this.style.borderColor='#667eea';this.style.background='rgba(102,126,234,0.05)'"
+                   onmouseout="this.style.borderColor='rgba(102,126,234,0.2)';this.style.background='#fff'"><i class="fas fa-times-circle"></i> Clear</a>
             @endif
         </form>
     </div>
 
-    <div class="table-responsive">
-        <table class="table align-middle">
+    <div class="table-responsive" style="flex: 1; overflow-y: auto; border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+        <table class="table table-modern align-middle" style="margin:0;">
             <thead>
             <tr>
-                <th>Item ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th class="text-end">Qty</th>
-                <th>Unit</th>
-                <th class="text-end">Unit Price</th>
-                <th style="width:130px;">Actions</th>
+                <th><i class="fas fa-hashtag"></i> Item ID</th>
+                <th><i class="fas fa-cube"></i> Name</th>
+                <th><i class="fas fa-tag"></i> Category</th>
+                <th class="text-end"><i class="fas fa-sort-numeric-down"></i> Qty</th>
+                <th><i class="fas fa-ruler"></i> Unit</th>
+                <th class="text-end"><i class="fas fa-dollar-sign"></i> Unit Price</th>
+                <th style="width:160px;text-align:center;"><i class="fas fa-cog"></i> Actions</th>
             </tr>
             </thead>
             <tbody>
             @forelse($items as $item)
                 <tr>
-                    <td>{{ $item->item_id }}</td>
-                    <td>{{ $item->name }}</td>
-                    <td>{{ $item->category?->name ?? '—' }}</td>
-                    <td class="text-end">{{ $item->quantity }}</td>
-                    <td>{{ $item->unit ?? '—' }}</td>
-                    <td class="text-end">₱{{ number_format($item->unit_price,2) }}</td>
+                    <td style="font-weight:600;color:#667eea;">#{{ $item->item_id }}</td>
+                    <td style="font-weight:600;color:#2d3748;">{{ $item->name }}</td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <span class="badge-modern badge-info" style="font-size:0.75rem;">
+                            {{ $item->category?->name ?? '—' }}
+                        </span>
+                    </td>
+                    <td class="text-end" style="font-weight:600;color:#2d3748;">{{ $item->quantity }}</td>
+                    <td style="color:#718096;">{{ $item->unit ?? '—' }}</td>
+                    <td class="text-end" style="font-weight:600;color:#48bb78;">₱{{ number_format($item->unit_price,2) }}</td>
+                    <td>
+                        <div class="d-flex gap-2 justify-content-center">
                             <a href="{{ route('inventory.edit', $item->item_id) }}"
-                               class="btn btn-edit" title="Edit">
-                                <i class="bi bi-pencil-square"></i>
+                               class="btn-action btn-action-edit" title="Edit Item">
+                                <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('inventory.destroy', $item->item_id) }}"
                                   method="POST"
-                                  onsubmit="return confirm('Delete this item?');">
+                                  onsubmit="return confirm('Are you sure you want to delete this item?');">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-delete" title="Delete">
-                                    <i class="bi bi-trash"></i>
+                                <button class="btn-action btn-action-delete" title="Delete Item" type="submit">
+                                    <i class="fas fa-trash"></i>
                                 </button>
                             </form>
                         </div>
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="7" class="empty-row text-center">No items found.</td></tr>
+                <tr><td colspan="7" class="text-center py-5">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="empty-state-title">No Items Found</div>
+                        <div class="empty-state-description">
+                            @if(request('search') || request('category_filter'))
+                                No items match your current filters. Try adjusting your search criteria.
+                            @else
+                                Your inventory is empty. Click "Add New Item" to get started.
+                            @endif
+                        </div>
+                    </div>
+                </td></tr>
             @endforelse
             </tbody>
         </table>

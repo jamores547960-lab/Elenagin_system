@@ -9,7 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stock_out', function (Blueprint $table) {
-            $table->string('stockout_id', 10)->primary();
+            $table->id();
+            $table->string('stockout_id', 10)->unique();
             $table->string('item_id', 12);
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedInteger('quantity');

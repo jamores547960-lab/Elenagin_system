@@ -36,7 +36,7 @@
 <div class="glass-card glass-card-wide" style="height: calc(100vh - 250px); display: flex; flex-direction: column;">
 
     <?php if(session('success')): ?>
-        <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(72, 187, 120, 0.05)); border-left: 4px solid #48bb78; border-radius: 10px; padding: 14px 18px; color: #2f855a; font-weight: 500; border: 1px solid rgba(72, 187, 120, 0.2);">
+        <div class="alert alert-success mb-3" style="background: linear-gradient(135deg, #48bb78, #38a169); border-left: 4px solid #22543d; border-radius: 10px; padding: 16px 20px; color: #ffffff; font-weight: 600; border: 2px solid #48bb78; box-shadow: 0 4px 12px rgba(72, 187, 120, 0.3);">
             <i class="fas fa-check-circle"></i> <?php echo e(session('success')); ?>
 
         </div>

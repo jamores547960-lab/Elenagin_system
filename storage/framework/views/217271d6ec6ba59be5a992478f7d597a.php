@@ -29,7 +29,7 @@
     <div class="min-h-screen p-4">
         <!-- Back Button (No Print) -->
         <div class="no-print max-w-4xl mx-auto mb-4">
-            <a href="{{ route('cashier.sales') }}" class="text-indigo-600 hover:text-indigo-700 flex items-center">
+            <a href="<?php echo e(route('cashier.sales')); ?>" class="text-indigo-600 hover:text-indigo-700 flex items-center">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
@@ -44,13 +44,13 @@
                 <!-- Transaction Header -->
                 <div class="flex justify-between items-start mb-6 pb-6 border-b-2 border-gray-300">
                     <div>
-                        <h2 class="text-2xl font-bold text-indigo-600">#SALE{{ str_pad($sale->id, 3, '0', STR_PAD_LEFT) }}</h2>
+                        <h2 class="text-2xl font-bold text-indigo-600">#SALE<?php echo e(str_pad($sale->id, 3, '0', STR_PAD_LEFT)); ?></h2>
                         <p class="text-sm text-gray-600 mt-1">Transaction ID</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-gray-900 font-semibold">{{ \Carbon\Carbon::parse($sale->sale_date)->format('F d, Y') }}</p>
-                        <p class="text-gray-700">{{ \Carbon\Carbon::parse($sale->sale_date)->format('g:i A') }}</p>
-                        <p class="text-sm text-gray-600 mt-1">Cashier: {{ $sale->user->name ?? 'N/A' }}</p>
+                        <p class="text-gray-900 font-semibold"><?php echo e(\Carbon\Carbon::parse($sale->sale_date)->format('F d, Y')); ?></p>
+                        <p class="text-gray-700"><?php echo e(\Carbon\Carbon::parse($sale->sale_date)->format('g:i A')); ?></p>
+                        <p class="text-sm text-gray-600 mt-1">Cashier: <?php echo e($sale->user->name ?? 'N/A'); ?></p>
                     </div>
                 </div>
 
@@ -70,15 +70,15 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($sale->items as $saleItem)
+                                <?php $__currentLoopData = $sale->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $saleItem): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr class="border-b border-gray-200">
-                                    <td class="py-3 text-sm text-gray-900">{{ $saleItem->item->name ?? 'N/A' }}</td>
-                                    <td class="py-3 text-sm text-gray-600">{{ $saleItem->item->item_id ?? 'N/A' }}</td>
-                                    <td class="py-3 text-sm text-gray-900 text-center">{{ $saleItem->quantity }}</td>
-                                    <td class="py-3 text-sm text-gray-900 text-right">₱{{ number_format($saleItem->unit_price, 2) }}</td>
-                                    <td class="py-3 text-sm font-semibold text-gray-900 text-right">₱{{ number_format($saleItem->line_total, 2) }}</td>
+                                    <td class="py-3 text-sm text-gray-900"><?php echo e($saleItem->item->name ?? 'N/A'); ?></td>
+                                    <td class="py-3 text-sm text-gray-600"><?php echo e($saleItem->item->item_id ?? 'N/A'); ?></td>
+                                    <td class="py-3 text-sm text-gray-900 text-center"><?php echo e($saleItem->quantity); ?></td>
+                                    <td class="py-3 text-sm text-gray-900 text-right">₱<?php echo e(number_format($saleItem->unit_price, 2)); ?></td>
+                                    <td class="py-3 text-sm font-semibold text-gray-900 text-right">₱<?php echo e(number_format($saleItem->line_total, 2)); ?></td>
                                 </tr>
-                                @endforeach
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </tbody>
                         </table>
                     </div>
@@ -89,20 +89,20 @@
                             <div class="space-y-2">
                                 <div class="flex justify-between text-sm text-gray-600">
                                     <span>Total Items:</span>
-                                    <span class="font-semibold text-gray-900">{{ $sale->items->count() }}</span>
+                                    <span class="font-semibold text-gray-900"><?php echo e($sale->items->count()); ?></span>
                                 </div>
                                 <div class="flex justify-between text-sm text-gray-600">
                                     <span>Total Quantity:</span>
-                                    <span class="font-semibold text-gray-900">{{ $sale->items->sum('quantity') }}</span>
+                                    <span class="font-semibold text-gray-900"><?php echo e($sale->items->sum('quantity')); ?></span>
                                 </div>
                                 <div class="flex justify-between text-sm text-gray-600">
                                     <span>Subtotal:</span>
-                                    <span class="font-semibold text-gray-900">₱{{ number_format($sale->total_amount, 2) }}</span>
+                                    <span class="font-semibold text-gray-900">₱<?php echo e(number_format($sale->total_amount, 2)); ?></span>
                                 </div>
                                 <div class="border-t-2 border-gray-300 pt-3 mt-3">
                                     <div class="flex justify-between items-center">
                                         <span class="text-xl font-bold text-gray-900">TOTAL:</span>
-                                        <span class="text-3xl font-bold text-green-600">₱{{ number_format($sale->total_amount, 2) }}</span>
+                                        <span class="text-3xl font-bold text-green-600">₱<?php echo e(number_format($sale->total_amount, 2)); ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +111,7 @@
                             <div class="mt-4 pt-4 border-t border-gray-200">
                                 <div class="flex justify-between text-sm mb-2">
                                     <span class="text-gray-600">Payment Method:</span>
-                                    @php
+                                    <?php
                                         $badgeColor = match($sale->payment_method) {
                                             'Cash' => 'bg-green-100 text-green-800',
                                             'Card' => 'bg-blue-100 text-blue-800',
@@ -120,24 +120,25 @@
                                             'Bank Transfer' => 'bg-indigo-100 text-indigo-800',
                                             default => 'bg-gray-100 text-gray-800'
                                         };
-                                    @endphp
-                                    <span class="px-3 py-1 {{ $badgeColor }} rounded-full text-xs font-semibold">
-                                        {{ $sale->payment_method }}
+                                    ?>
+                                    <span class="px-3 py-1 <?php echo e($badgeColor); ?> rounded-full text-xs font-semibold">
+                                        <?php echo e($sale->payment_method); ?>
+
                                     </span>
                                 </div>
 
-                                @if($sale->payment_method === 'Cash' && $sale->amount_received)
+                                <?php if($sale->payment_method === 'Cash' && $sale->amount_received): ?>
                                 <div class="space-y-2 mt-3">
                                     <div class="flex justify-between text-sm">
                                         <span class="text-gray-600">Amount Received:</span>
-                                        <span class="font-semibold text-gray-900">₱{{ number_format($sale->amount_received, 2) }}</span>
+                                        <span class="font-semibold text-gray-900">₱<?php echo e(number_format($sale->amount_received, 2)); ?></span>
                                     </div>
                                     <div class="flex justify-between text-sm">
                                         <span class="text-gray-600">Change Given:</span>
-                                        <span class="font-semibold text-green-600">₱{{ number_format($sale->change_amount ?? 0, 2) }}</span>
+                                        <span class="font-semibold text-green-600">₱<?php echo e(number_format($sale->change_amount ?? 0, 2)); ?></span>
                                     </div>
                                 </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -148,7 +149,8 @@
                     <p>Thank you for your purchase!</p>
                     <p class="mt-2">This serves as your official receipt.</p>
                     <p class="mt-4 text-xs text-gray-500">
-                        Transaction completed on {{ \Carbon\Carbon::parse($sale->sale_date)->format('F d, Y \a\t g:i A') }}
+                        Transaction completed on <?php echo e(\Carbon\Carbon::parse($sale->sale_date)->format('F d, Y \a\t g:i A')); ?>
+
                     </p>
                 </div>
 
@@ -165,4 +167,4 @@
         </div>
     </div>
 </body>
-</html>
+</html><?php /**PATH C:\Users\Sydney Jagape\kerk\resources\views/cashier/transaction.blade.php ENDPATH**/ ?>

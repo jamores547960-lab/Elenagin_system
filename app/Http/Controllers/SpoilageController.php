@@ -68,10 +68,11 @@ class SpoilageController extends Controller
             // Generate stockout_id
             $latestStockOut = StockOut::withTrashed()
                 ->orderByDesc('id')
+                ->lockForUpdate()
                 ->first();
             
-            $nextNum = $latestStockOut ? (intval(substr($latestStockOut->stockout_id, 3)) + 1) : 1;
-            $stockoutId = 'SO-' . str_pad($nextNum, 7, '0', STR_PAD_LEFT);
+            $nextNum = $latestStockOut ? ($latestStockOut->id + 1) : 1;
+            $stockoutId = 'SO-' . str_pad($nextNum, 8, '0', STR_PAD_LEFT);
 
             // Create stock out record
             $stockOut = StockOut::create([
